@@ -1,17 +1,22 @@
 class TravelGraphic {
+  constructor() {
+    this.initialize();
+  }
+
   handleMusic() {
     if (!music.isPlaying()) {
       console.log("음악 재생 시작");
       music.play();
     }
   }
+
   reset() {
     console.log("Travel Graphic 초기화");
-    // 그래픽 관련 상태 초기화
+    this.initialize();
   }
 
-  constructor() {
-    console.log("TravelGraphic instance created");
+  initialize() {
+    console.log("TravelGraphic instance initialized");
     this.objs = [];
     this.colors = [
       "#F2BBEF",
@@ -27,7 +32,6 @@ class TravelGraphic {
       "#FA7610",
     ];
     this.img = loadImage("assets/cloud3.png"); // 이미지 로드
-    // this.img = loadImage("assets/cloud.jpg"); // 이미지 로드
     this.addObj();
   }
 
@@ -78,6 +82,7 @@ class TravelGraphic {
 }
 
 class OBR {
+  // 기존 코드 유지
   constructor(x, y, colors) {
     this.x = x;
     this.y = y;

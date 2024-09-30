@@ -1,69 +1,59 @@
-// class PlayerGraphic {
-//   draw() {
-//     createCanvas(1280, 720);
-//     noFill();
-//     strokeWeight(2);
-//     strokeCap(ROUND);
-//     frameRate(2); // nb de frames par seconde
-
-//     background(0);
-
-//     for (var i = 0; i < 15; i++) {
-//       stroke(random(155, 255), random(155, 255), random(155, 255));
-
-//       var rayonList = [
-//         0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280,
-//         300, 320, 340, 360, 380, 400, 420, 440, 460, 480, 500, 520, 540,
-//       ]; // liste de rayons
-//       var a = round(random(27)); // nb aléatoire > nb de cases du tableau
-//       var w = rayonList[a]; //taille rayon case aléatoire a du tableau rayonList
-
-//       var r = Math.random() * (140 - 20) + 20; // (max - min) + min  // nb aléatoire entre 20 et 140
-//       arc(width / 2, height / 2, w, w, random(500), random(500)); // arc (x,y,rayon,debutAngle,finAngle,counterclockwise)
-//       arc(width / 2, height / 2, r, r, random(500), random(500));
-
-//       smooth(); // bords plus lisses
-//     }
-//   }
-// }
-
 class PlayerGraphic {
+  constructor() {
+    this.lastUpdateTime = 0;
+    this.updateInterval = 1000; // 그래픽 업데이트 간격을 밀리초 단위로 설정 (1초)
+    this.pg = createGraphics(width, height); // 오프스크린 그래픽 버퍼 생성
+    this.updateGraphics(); // 그래픽 초기화
+  }
+
   handleMusic() {
-    // Player 레이블일 때 음악 멈춤
     console.log("Player 레이블에서 음악 중지");
     if (music.isPlaying()) {
-      music.stop(); // 음악이 재생 중일 때만 중지
+      music.stop();
     }
   }
+
   reset() {
-    console.log("Music Graphic 초기화");
-    // 그래픽 관련 상태 초기화
+    console.log("Player Graphic 초기화");
+    this.lastUpdateTime = millis(); // 타이밍 변수 초기화
+    this.updateGraphics(); // 그래픽 초기화
   }
 
-  draw() {
-    createCanvas(1280, 720);
-    noFill();
-    strokeWeight(2);
-    strokeCap(ROUND);
-    frameRate(1); // nb de frames par seconde
-
-    background(0);
+  updateGraphics() {
+    // 오프스크린 버퍼에 그래픽 그리기
+    this.pg.background(0);
+    this.pg.clear(); // 버퍼 지우기
+    this.pg.noFill();
+    this.pg.strokeWeight(2);
+    this.pg.strokeCap(ROUND);
 
     for (var i = 0; i < 10; i++) {
-      stroke(random(155, 255), random(155, 255), random(155, 255));
+      this.pg.stroke(random(155, 255), random(155, 255), random(155, 255));
 
       var rayonList = [
         0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280,
         300, 320, 340, 360, 380, 400, 420, 440, 460, 480, 500, 520, 540,
-      ]; // liste de rayons
-      var a = round(random(27)); // nb aléatoire > nb de cases du tableau
-      var w = rayonList[a]; //taille rayon case aléatoire a du tableau rayonList
+      ];
+      var a = round(random(27));
+      var w = rayonList[a];
 
-      var r = Math.random() * (140 - 20) + 20; // (max - min) + min  // nb aléatoire entre 20 et 140
-      arc(width / 2, height / 2, w, w, random(500), random(500)); // arc (x,y,rayon,debutAngle,finAngle,counterclockwise)
-      arc(width / 2, height / 2, r, r, random(500), random(500));
-
-      smooth(); // bords plus lisses
+      var r = random(20, 140);
+      var startAngle = random(TWO_PI);
+      var endAngle = random(TWO_PI);
+      this.pg.arc(width / 2, height / 2, w, w, startAngle, endAngle);
+      this.pg.arc(width / 2, height / 2, r, r, startAngle, endAngle);
     }
+    this.pg.smooth();
+  }
+
+  draw() {
+    let currentTime = millis();
+    if (currentTime - this.lastUpdateTime >= this.updateInterval) {
+      this.lastUpdateTime = currentTime;
+      this.updateGraphics(); // 그래픽 업데이트
+    }
+
+    // 오프스크린 버퍼를 메인 캔버스에 그리기
+    image(this.pg, 0, 0);
   }
 }

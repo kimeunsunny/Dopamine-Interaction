@@ -1,25 +1,22 @@
-let colors = [
-  "#ff0000",
-  "#00ff00",
-  "#0000ff",
-  "#ffff00",
-  "#00ffff",
-  "#ff00ff",
-  "#ffffff",
-];
-
 class DarkGraphic {
+  constructor() {
+    this.initialize();
+  }
+
   handleMusic() {
     if (!music.isPlaying()) {
       console.log("음악 재생 시작");
       music.play();
     }
   }
+
   reset() {
-    console.log("Music Graphic 초기화");
-    // 그래픽 관련 상태 초기화
+    console.log("Dark Graphic 초기화");
+    this.initialize();
   }
-  constructor() {
+
+  initialize() {
+    // 그래픽 관련 상태 초기화
     this.fw = [];
     for (let i = 0; i < 20; i++) {
       this.fw.push(new Fire());
@@ -27,8 +24,7 @@ class DarkGraphic {
   }
 
   draw() {
-    // 배경을 검정색으로 설정
-    background(0);
+    background(0, 140); // 알파 값을 조절하여 투명도 설정
 
     // Fireworks effects
     for (let f of this.fw) {
@@ -93,3 +89,14 @@ class Fire {
     this.move();
   }
 }
+
+// 불꽃 색상 배열은 전역 또는 클래스 내부에 위치시킵니다.
+let colors = [
+  "#ff0000",
+  "#00ff00",
+  "#0000ff",
+  "#ffff00",
+  "#00ffff",
+  "#ff00ff",
+  "#ffffff",
+];
