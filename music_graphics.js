@@ -42,7 +42,7 @@ class MusicGraphic {
   }
 
   draw() {
-    background(0, 150); // 알파 값을 조절하여 투명도 설정
+    background(0, 180); // 알파 값을 조절하여 투명도 설정
 
     this.angle = this.baseAngle;
 

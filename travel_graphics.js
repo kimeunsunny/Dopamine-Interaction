@@ -57,7 +57,7 @@ class TravelGraphic {
   }
 
   addObj() {
-    let num = int(random(1, 50));
+    let num = int(random(5, 50));
     for (let i = 0; i < num; i++) {
       this.objs.push(new OBR(random(width), height, this.colors)); // 캔버스 하단에서 시작
     }
@@ -95,7 +95,7 @@ class OBR {
     this.t1 = random(23904);
     this.t2 = random(43894);
     this.xStep = random(-1, 1) * 2;
-    this.yStep = random(1, 9); // 위로 이동
+    this.yStep = random(5, 10); // 위로 이동 속도값
     this.t1Step = random(0.1) * random();
     this.t2Step = random(0.1) * random();
     this.aStep = random(1, 2);
