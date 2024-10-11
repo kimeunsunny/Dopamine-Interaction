@@ -1,5 +1,6 @@
 // p5.js
 // node server.js
+// http://localhost:3000
 
 let usbVideo1; // 첫 번째 USB 웹캠 (300x300) - 사물 인식용
 let usbVideo2; // 두 번째 USB 웹캠 (1280x720) - 그래픽 표시용
@@ -21,9 +22,9 @@ let labelStates = {
 
 // 두 개의 USB 웹캠의 deviceId를 직접 지정
 const deviceId1 =
-  "08094023da0370c72a8835b668d03f414b212803e733508e7443d561b2af9d4b"; //사물 USB2.0 PC CAMERA
+  "f09accbaf2b70bf66dc212579211f093129dedf0924382da9659917e08c2a9e"; //사물 USB2.0 PC CAMERA
 const deviceId2 =
-  "569bb77c7b077baaa7acd176a2c25d511295036f63595da13f4e0e788a5ca008"; //사람 SNAP U2
+  "48648627558f97ed0e286b4bd3bd63b5e37f60235f3ec58d0494b8b0e888715"; //사람 SNAP U2
 
 function preload() {
   classifier = ml5.imageClassifier(modelURL + "model.json");
@@ -36,16 +37,16 @@ function setup() {
   createCanvas(1280, 720);
 
   // 장치 목록을 출력
-  // navigator.mediaDevices
-  //   .enumerateDevices()
-  //   .then((devices) => {
-  //     devices.forEach((device) => {
-  //       console.log(`${device.kind}: ${device.label}, id = ${device.deviceId}`);
-  //     });
-  //   })
-  //   .catch((err) => {
-  //     console.error("장치 목록을 가져오는 중 오류 발생:", err);
-  //   });
+  navigator.mediaDevices
+    .enumerateDevices()
+    .then((devices) => {
+      devices.forEach((device) => {
+        console.log(`${device.kind}: ${device.label}, id = ${device.deviceId}`);
+      });
+    })
+    .catch((err) => {
+      console.error("장치 목록을 가져오는 중 오류 발생:", err);
+    });
 
   usbVideo1 = createCapture(
     {

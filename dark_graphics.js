@@ -24,7 +24,7 @@ class DarkGraphic {
   }
 
   draw() {
-    background(0, 140); // 알파 값을 조절하여 투명도 설정
+    background(0, 180); // 알파 값을 조절하여 투명도 설정
 
     // Fireworks effects
     for (let f of this.fw) {
@@ -51,7 +51,7 @@ class Fire {
     for (let i = 0; i < this.num; i++) {
       rotate(TAU / this.num);
       stroke(this.col);
-      strokeWeight(3);
+      strokeWeight(4); //선 두깨
       line(this.p1, 0, this.p2, 0);
       stroke(255);
       strokeWeight(1);
