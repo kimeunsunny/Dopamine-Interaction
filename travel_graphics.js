@@ -1,13 +1,9 @@
+// 전역 이미지 변수
+// let travelImage; // TravelGraphic에서 사용할 이미지
+
 class TravelGraphic {
   constructor() {
     this.initialize();
-  }
-
-  handleMusic() {
-    if (!music.isPlaying()) {
-      console.log("음악 재생 시작");
-      music.play();
-    }
   }
 
   reset() {
@@ -31,13 +27,12 @@ class TravelGraphic {
       "#F91F0E",
       "#FA7610",
     ];
-    this.img = loadImage("assets/cloud3.png"); // 이미지 로드
     this.addObj();
   }
 
   draw() {
-    if (this.img) {
-      image(this.img, 0, 0, 1280, 720); // 이미지 배경 설정
+    if (travelImage) {
+      image(travelImage, 0, 0, 1600, 800); // 이미지 배경 설정
     }
     this.bkgd();
     for (let i of this.objs) {
@@ -67,7 +62,6 @@ class TravelGraphic {
     let wid = width * 1.2;
     let c = 90;
     let w = wid / c;
-    let pos = [];
 
     noStroke();
     for (let i = 0; i < c; i++) {
@@ -82,7 +76,6 @@ class TravelGraphic {
 }
 
 class OBR {
-  // 기존 코드 유지
   constructor(x, y, colors) {
     this.x = x;
     this.y = y;
