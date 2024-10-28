@@ -1,9 +1,9 @@
-// p5.js
-// node server.js
-// http://localhost:3000
+// 사용법:터미널에서 1번 내용을 입력한다. 2번 서버를 실행한다.
+// 1. node server.js
+// 2. http://localhost:3000
 
 let usbVideo1; // 첫 번째 USB 웹캠 (300x300) - 사물 인식용
-let usbVideo2; // 두 번째 USB 웹캠 (1280x720) - 그래픽 표시용
+let usbVideo2; // 두 번째 USB 웹캠 (1920x800) - 그래픽 표시용
 let label = "waiting...";
 let previousLabel = ""; // 이전 레이블 추적
 let classifier;
@@ -11,12 +11,11 @@ const modelURL = "https://teachablemachine.withgoogle.com/models/4z3m_eZsb/"; //
 let graphicInstances = {};
 let musicFiles = {}; // 음악 파일들을 저장할 객체
 let travelImage; // TravelGraphic에서 사용할 이미지
-// let music; // p5.Sound 객체
 let labelChangeTimer = null; // 레이블 변경 타이머
 const LABEL_CHANGE_DELAY = 300; // 레이블 변경 대기 시간(ms)
 const CONFIDENCE_THRESHOLD = 0.75; // 레이블 신뢰도 임계값
 let sameLabelCount = 0; // 동일 레이블 연속 인식 횟수
-const SAME_LABEL_THRESHOLD = 3; // 동일 레이블 연속 인식 필요 횟수
+const SAME_LABEL_THRESHOLD = 2; // 동일 레이블 연속 인식 필요 횟수
 
 // 레이블 상태 관리 객체
 let labelStates = {
@@ -29,9 +28,9 @@ let labelStates = {
 
 // 두 개의 USB 웹캠의 deviceId를 직접 지정
 const deviceId1 =
-  "075089b9c0f0f2ea6d02fa7e37aa6efd8584526af6e5a7134851c994189f9605"; //사물 C270 HD WEBCAM
+  "b756dffc852be1eda959248eff38771758bcc3d6d4a61db610982d1ae679bce5"; //사물 C270 HD WEBCAM
 const deviceId2 =
-  "fdd634577df40fa9d3aa379b19965fb70d7728b3e7c824939651dc1bd3d2fa83"; //사람 SNAP U2
+  "f81f35712ec7def2b9dae7f74a5c2fb99a3c684aa51c4fe4c15f9f1fb3024f0d"; //사람 SNAP U2
 
 function preload() {
   classifier = ml5.imageClassifier(modelURL + "model.json");
@@ -70,7 +69,8 @@ function setup() {
     () => console.log("첫 번째 USB 웹캠 준비 완료")
   );
   usbVideo1.size(300, 300);
-  // usbVideo1.hide(); // 첫 번째 웹캠은 페이지에서 숨김 (사물 인식 용도)
+  // usbVideo1.hide();
+  // 첫 번째 웹캠은 페이지에서 숨김 (사물 인식 용도)
 
   usbVideo2 = createCapture(
     {
@@ -100,6 +100,16 @@ function initializeGraphics() {
   console.log("Graphic instances initialized:", graphicInstances);
 }
 
+// function initializeGraphics() {
+//   graphicInstances["Cute"] = new CuteGraphic(musicFiles["Cute"]);
+//   graphicInstances["Dark"] = new DarkGraphic(musicFiles["Dark"]);
+//   graphicInstances["Travel"] = new TravelGraphic();
+//   graphicInstances["Player"] = new PlayerGraphic();
+//   graphicInstances["Music"] = new MusicGraphic(musicFiles["Music"]);
+
+//   console.log("Graphic instances initialized:", graphicInstances);
+// }
+
 function classifyVideo() {
   if (usbVideo1 && classifier) {
     classifier.classify(usbVideo1, gotResults); // usbVideo1로 사물 인식
@@ -124,7 +134,7 @@ function gotResults(error, results) {
     let highestConfidenceResult = results[0];
     let newLabel = highestConfidenceResult.label.trim();
     let confidence = highestConfidenceResult.confidence;
-    console.log(`업데이트된 레이블: ${newLabel}, 신뢰도: ${confidence}`);
+    // console.log(`업데이트된 레이블: ${newLabel}, 신뢰도: ${confidence}`);
 
     // 신뢰도가 임계값 이상인 경우에만 레이블 변경 고려
     if (confidence >= CONFIDENCE_THRESHOLD) {
@@ -141,7 +151,7 @@ function gotResults(error, results) {
 
           // 새 레이블에 해당하는 음악 재생
           if (musicFiles[newLabel]) {
-            console.log(`${newLabel} 레이블 음악 재생 시작`);
+            // console.log(`${newLabel} 레이블 음악 재생 시작`);
             musicFiles[newLabel].play();
           }
 
@@ -161,63 +171,13 @@ function gotResults(error, results) {
 
       previousLabel = newLabel;
     } else {
-      console.log(`신뢰도 낮음: ${confidence}. 레이블 변경 없음.`);
+      // console.log(`신뢰도 낮음: ${confidence}. 레이블 변경 없음.`);
       sameLabelCount = 0; // 신뢰도가 낮으면 연속 인식 횟수 초기화
     }
   }
 
   classifyVideo(); // 연속적인 사물 인식 수행
 }
-
-// 이전 규칙 코드
-// function gotResults(error, results) {
-//   if (error) {
-//     console.error("사물 인식 오류:", error);
-//     return;
-//   }
-
-//   if (results && results.length > 0) {
-//     let highestConfidenceResult = results[0];
-//     let newLabel = highestConfidenceResult.label.trim();
-//     console.log(`업데이트된 레이블: ${newLabel}`);
-
-//     // 모든 레이블의 상태를 false로 초기화
-//     for (let key in labelStates) {
-//       labelStates[key] = false;
-//     }
-
-//     // 현재 인식된 레이블의 상태를 true로 설정
-//     if (labelStates.hasOwnProperty(newLabel)) {
-//       labelStates[newLabel] = true;
-//     }
-
-//     // 레이블 상태 변화 감지 및 그래픽 리셋
-//     if (newLabel !== previousLabel) {
-//       // 모든 음악 중지
-//       stopAllMusic();
-
-//       // 새 레이블에 해당하는 음악 재생
-//       if (musicFiles[newLabel]) {
-//         console.log(`${newLabel} 레이블 음악 재생 시작`);
-//         musicFiles[newLabel].play();
-//       }
-
-//       // 그래픽 인스턴스 리셋
-//       if (
-//         graphicInstances[newLabel] &&
-//         typeof graphicInstances[newLabel].reset === "function"
-//       ) {
-//         graphicInstances[newLabel].reset();
-//       }
-
-//       previousLabel = newLabel;
-//     }
-
-//     label = newLabel;
-//   }
-
-//   classifyVideo(); // 연속적인 사물 인식 수행
-// }
 
 function draw() {
   background(0);
@@ -232,12 +192,6 @@ function draw() {
       pop();
     }
   }
-
-  // 레이블 텍스트
-  // textSize(32);
-  // textAlign(CENTER, CENTER);
-  // fill(255);
-  // text(label, width / 2, height - 32);
 
   if (label !== "waiting..." && graphicInstances[label]) {
     graphicInstances[label].draw();

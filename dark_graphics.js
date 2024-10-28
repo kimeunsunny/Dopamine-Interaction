@@ -52,7 +52,7 @@ class DarkGraphic {
   }
 
   draw() {
-    background(0, 180); // 알파 값을 조절하여 투명도 설정
+    background(0, 170); // 알파 값을 조절하여 투명도 설정
 
     // 음악의 볼륨 레벨 가져오기
     let level = this.amplitude.getLevel();
