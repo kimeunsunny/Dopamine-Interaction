@@ -2,7 +2,7 @@
 class PlayerGraphic {
   constructor() {
     this.lastUpdateTime = 0;
-    this.updateInterval = 1000; // 그래픽 업데이트 간격을 밀리초 단위로 설정 (1초)
+    this.updateInterval = 2000; // 그래픽 업데이트 간격을 밀리초 단위로 설정 (1초)
     this.pg = createGraphics(width, height); // 오프스크린 그래픽 버퍼 생성
     this.updateGraphics(); // 그래픽 초기화
   }

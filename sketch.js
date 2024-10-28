@@ -28,9 +28,9 @@ let labelStates = {
 
 // 두 개의 USB 웹캠의 deviceId를 직접 지정
 const deviceId1 =
-  "b756dffc852be1eda959248eff38771758bcc3d6d4a61db610982d1ae679bce5"; //사물 C270 HD WEBCAM
+  "2ebfce1b6090e13c969f1bb177a2794dcbd1fb1fb906df51609fa7f682188e03"; //사물 C270 HD WEBCAM
 const deviceId2 =
-  "f81f35712ec7def2b9dae7f74a5c2fb99a3c684aa51c4fe4c15f9f1fb3024f0d"; //사람 SNAP U2
+  "4fafb3cc7e56f0d367847b6c36ae96885db545c0f9eee721ecc8953dcf62f084"; //사람 SNAP U2
 
 function preload() {
   classifier = ml5.imageClassifier(modelURL + "model.json");
@@ -51,16 +51,16 @@ function setup() {
   createCanvas(1920, 800);
 
   // 장치 목록을 출력
-  // navigator.mediaDevices
-  //   .enumerateDevices()
-  //   .then((devices) => {
-  //     devices.forEach((device) => {
-  //       console.log(`${device.kind}: ${device.label}, id = ${device.deviceId}`);
-  //     });
-  //   })
-  //   .catch((err) => {
-  //     console.error("장치 목록을 가져오는 중 오류 발생:", err);
-  //   });
+  navigator.mediaDevices
+    .enumerateDevices()
+    .then((devices) => {
+      devices.forEach((device) => {
+        console.log(`${device.kind}: ${device.label}, id = ${device.deviceId}`);
+      });
+    })
+    .catch((err) => {
+      console.error("장치 목록을 가져오는 중 오류 발생:", err);
+    });
 
   usbVideo1 = createCapture(
     {
@@ -85,30 +85,16 @@ function setup() {
   classifyVideo();
 }
 
+
 function initializeGraphics() {
-  graphicInstances["Cute"] = new CuteGraphic();
-  graphicInstances["Dark"] = new DarkGraphic();
+  graphicInstances["Cute"] = new CuteGraphic(musicFiles["Cute"]);
+  graphicInstances["Dark"] = new DarkGraphic(musicFiles["Dark"]);
   graphicInstances["Travel"] = new TravelGraphic();
   graphicInstances["Player"] = new PlayerGraphic();
-
-  // MusicGraphic 인스턴스 생성
   graphicInstances["Music"] = new MusicGraphic(musicFiles["Music"]);
-  // DarkGraphic 인스턴스 생성
-  graphicInstances["Dark"] = new DarkGraphic(musicFiles["Dark"]);
-  graphicInstances["Cute"] = new CuteGraphic(musicFiles["Cute"]);
 
   console.log("Graphic instances initialized:", graphicInstances);
 }
-
-// function initializeGraphics() {
-//   graphicInstances["Cute"] = new CuteGraphic(musicFiles["Cute"]);
-//   graphicInstances["Dark"] = new DarkGraphic(musicFiles["Dark"]);
-//   graphicInstances["Travel"] = new TravelGraphic();
-//   graphicInstances["Player"] = new PlayerGraphic();
-//   graphicInstances["Music"] = new MusicGraphic(musicFiles["Music"]);
-
-//   console.log("Graphic instances initialized:", graphicInstances);
-// }
 
 function classifyVideo() {
   if (usbVideo1 && classifier) {
