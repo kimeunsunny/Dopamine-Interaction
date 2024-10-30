@@ -2,35 +2,26 @@
 // 1. node server.js
 // 2. http://localhost:3000
 
+
 let usbVideo1; // 첫 번째 USB 웹캠 (300x300) - 사물 인식용
 let usbVideo2; // 두 번째 USB 웹캠 (1920x800) - 그래픽 표시용
 let label = "waiting...";
-let previousLabel = ""; // 이전 레이블 추적
+let previousLabel = "";
 let classifier;
 const modelURL = "https://teachablemachine.withgoogle.com/models/4z3m_eZsb/"; // 모델 URL
 let graphicInstances = {};
-let musicFiles = {}; // 음악 파일들을 저장할 객체
-let travelImage; // TravelGraphic에서 사용할 이미지
-let labelChangeTimer = null; // 레이블 변경 타이머
-const LABEL_CHANGE_DELAY = 300; // 레이블 변경 대기 시간(ms)
-const CONFIDENCE_THRESHOLD = 0.75; // 레이블 신뢰도 임계값
-let sameLabelCount = 0; // 동일 레이블 연속 인식 횟수
-const SAME_LABEL_THRESHOLD = 2; // 동일 레이블 연속 인식 필요 횟수
+let musicFiles = {};
+let travelImage;
+let labelChangeTimer = null;
+const LABEL_CHANGE_DELAY = 300;
+const CONFIDENCE_THRESHOLD = 0.75;
+let sameLabelCount = 0;
+const SAME_LABEL_THRESHOLD = 2;
+const debugMode = false; // 장치 목록을 출력하려면 true, 출력하지 않으려면 false로 설정
 
-// 레이블 상태 관리 객체
-let labelStates = {
-  Cute: false,
-  Dark: false,
-  Music: false,
-  Travel: false,
-  Player: false,
-};
-
-// 두 개의 USB 웹캠의 deviceId를 직접 지정
-const deviceId1 =
-  "2ebfce1b6090e13c969f1bb177a2794dcbd1fb1fb906df51609fa7f682188e03"; //사물 C270 HD WEBCAM
-const deviceId2 =
-  "4fafb3cc7e56f0d367847b6c36ae96885db545c0f9eee721ecc8953dcf62f084"; //사람 SNAP U2
+// 원하는 웹캠의 이름을 지정합니다.
+const desiredLabel1 = "Logi C270 HD WebCam";
+const desiredLabel2 = "SNAP U2";
 
 function preload() {
   classifier = ml5.imageClassifier(modelURL + "model.json");
@@ -44,47 +35,99 @@ function preload() {
 
   // TravelGraphic에서 사용할 이미지 로드
   travelImage = loadImage("assets/cloud1920.png");
-  // playerImage = loadImage("assets/player.png");
 }
 
 function setup() {
   createCanvas(1920, 800);
 
-  // 장치 목록을 출력
+  // 카메라 접근 권한 요청
   navigator.mediaDevices
-    .enumerateDevices()
-    .then((devices) => {
-      devices.forEach((device) => {
-        console.log(`${device.kind}: ${device.label}, id = ${device.deviceId}`);
-      });
+    .getUserMedia({ video: true })
+    .then((stream) => {
+      // 스트림을 중지하여 불필요한 카메라 사용을 방지
+      stream.getTracks().forEach((track) => track.stop());
+
+      // 장치 목록 가져오기
+      navigator.mediaDevices
+        .enumerateDevices()
+        .then((devices) => {
+          // 원하는 장치의 deviceId를 찾습니다.
+          let deviceId1 = null;
+          let deviceId2 = null;
+
+          devices.forEach((device) => {
+            if (debugMode) {
+              console.log(`${device.kind}: ${device.label}, id = ${device.deviceId}`);
+            }
+            if (device.kind === "videoinput") {
+              if (device.label.includes(desiredLabel1)) {
+                deviceId1 = device.deviceId;
+              }
+              if (device.label.includes(desiredLabel2)) {
+                deviceId2 = device.deviceId;
+              }
+            }
+          });
+
+          // 찾은 deviceId로 스트림 생성
+          if (deviceId1) {
+            usbVideo1 = createCapture(
+              {
+                video: {
+                  deviceId: { exact: deviceId1 },
+                  width: 300,
+                  height: 300,
+                },
+              },
+              () => {
+                console.log("첫 번째 USB 웹캠 준비 완료");
+                usbVideo1.size(300, 300);
+                // usbVideo1.hide(); // 필요 시 숨김
+
+                // usbVideo1이 준비된 후에 classifyVideo() 호출
+                classifyVideo();
+              }
+            );
+          } else {
+            console.error("첫 번째 웹캠을 찾을 수 없습니다.");
+          }
+
+          if (deviceId2) {
+            usbVideo2 = createCapture(
+              {
+                video: {
+                  deviceId: { exact: deviceId2 },
+                  width: 1920,
+                  height: 800,
+                },
+              },
+              () => {
+                console.log("두 번째 USB 웹캠 준비 완료");
+                usbVideo2.size(1920, 800);
+                usbVideo2.hide(); // 일단 숨기지만 draw에서 다시 렌더링
+
+                // usbVideo2가 준비된 후에 그래픽 초기화
+                initializeGraphics();
+              }
+            );
+          } else {
+            console.error("두 번째 USB 웹캠을 찾을 수 없습니다.");
+          }
+        })
+        .catch((err) => {
+          console.error("장치 목록을 가져오는 중 오류 발생:", err);
+        });
     })
     .catch((err) => {
-      console.error("장치 목록을 가져오는 중 오류 발생:", err);
+      console.error("카메라 접근 권한을 얻는 중 오류 발생:", err);
     });
-
-  usbVideo1 = createCapture(
-    {
-      video: { deviceId: { exact: deviceId1 }, width: 300, height: 300 },
-    },
-    () => console.log("첫 번째 USB 웹캠 준비 완료")
-  );
-  usbVideo1.size(300, 300);
-  // usbVideo1.hide();
-  // 첫 번째 웹캠은 페이지에서 숨김 (사물 인식 용도)
-
-  usbVideo2 = createCapture(
-    {
-      video: { deviceId: { exact: deviceId2 }, width: 1920, height: 800 },
-    },
-    () => console.log("두 번째 USB 웹캠 준비 완료")
-  );
-  usbVideo2.size(1920, 800);
-  usbVideo2.hide(); // 일단 숨기지만 draw에서 다시 렌더링
-
-  initializeGraphics();
-  classifyVideo();
 }
 
+// 불필요한 주석 제거 또는 위치 조정
+// usbVideo2.size(1920, 800);
+// usbVideo2.hide(); // 일단 숨기지만 draw에서 다시 렌더링
+// initializeGraphics();
+// classifyVideo();
 
 function initializeGraphics() {
   graphicInstances["Cute"] = new CuteGraphic(musicFiles["Cute"]);
@@ -183,3 +226,4 @@ function draw() {
     graphicInstances[label].draw();
   }
 }
+
