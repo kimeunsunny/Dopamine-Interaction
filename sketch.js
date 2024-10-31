@@ -4,7 +4,7 @@
 
 
 let usbVideo1; // 첫 번째 USB 웹캠 (300x300) - 사물 인식용
-let usbVideo2; // 두 번째 USB 웹캠 (1920x800) - 그래픽 표시용
+let usbVideo2; // 두 번째 USB 웹캠 (1920x860) - 그래픽 표시용
 let label = "waiting...";
 let previousLabel = "";
 let classifier;
@@ -38,7 +38,7 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(1920, 800);
+  createCanvas(1920, 870);
 
   // 카메라 접근 권한 요청
   navigator.mediaDevices
@@ -98,12 +98,12 @@ function setup() {
                 video: {
                   deviceId: { exact: deviceId2 },
                   width: 1920,
-                  height: 800,
+                  height: 870,
                 },
               },
               () => {
                 console.log("두 번째 USB 웹캠 준비 완료");
-                usbVideo2.size(1920, 800);
+                usbVideo2.size(1920, 870);
                 usbVideo2.hide(); // 일단 숨기지만 draw에서 다시 렌더링
 
                 // usbVideo2가 준비된 후에 그래픽 초기화
